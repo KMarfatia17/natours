@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const AppError = require('./utils/appError');
+const globalErrorHandler = require('./controllers/ErrorController');
 
 const app = express();
 
@@ -29,24 +30,14 @@ app.all('*', (req, res, next) => {
   //   status: 'fail',
   //   message: `cannot find path to ${req.originalURL} on this server!`
   // });
-  const err = new Error(
-    `cannot find path to ${req.originalURL} on this server!`
-  );
-  err.status = 'Fail';
-  err.statusCode = 404;
-  next(err);
+  // const err = new Error(
+  //   `cannot find path to ${req.originalURL} on this server!`
+  // );
+  // err.status = 'Fail';
+  // err.statusCode = 404;
+  next(new AppError(`cannot find path to ${req.originalURL} on this server!`));
 });
 
-app.use((err, req, res, next) => {
-  err.statusCode = err.statusCode || 500;
-  err.message =
-    err.message || `cannot find path to ${req.originalURL} on this server!`;
-  err.status = err.status || 'Fail';
-
-  res.statusCode(err.statusCode).json({
-    status: err.status,
-    message: err.message
-  });
-});
+app.use(globalErrorHandler);
 
 module.exports = app;

@@ -15,7 +15,7 @@ mongoose
   .then(() => {
     console.log('db connection is successful');
   })
-  .catch(err => console.log("see this is the error", err));
+  .catch(err => console.log('see this is the error', err));
 
 // const testTour = new Tour({
 //   name: 'the park camper',
