@@ -29,6 +29,31 @@ mongoose
 //   .catch(err => console.log(err));
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`App running on port ${port}...`);
+});
+
+// older node JS
+process.on('unhandledRejection', err => {
+  // console.log(err.name, err.message);
+  console.log('UNHANDLED REJECTION, Server is shutting down...');
+  server.close(() => {
+    process.exit(1);
+  });
+});
+
+// stack overflow new node JS still not working as expected date 2 years ago means 2020
+// process.on('unhandledRejection', function(reason, p) {
+//   console.log('Unhandled', reason, p); // log all your errors, "unsuppressing" them.
+//   console.log('UNHANDLED REJECTION, Server is shutting down...');
+//   throw reason; // optional, in case you want to treat these as errors
+// });
+
+process.on('uncaughtException', err => {
+  // console.log(err.name, err.message);
+  console.log('UNCAUGHT Exception, Server is shutting down...');
+  console.log(err);
+  server.close(() => {
+    process.exit(1);
+  });
 });

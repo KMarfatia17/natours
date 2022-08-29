@@ -11,6 +11,7 @@ const sendErrorDev = (err, res) => {
 
 const sendErrorProd = (err, res) => {
   // when opertional errors happen and we trust the errors
+  // console.log('err', err);
   if (err.isOperational) {
     res.status(err.statusCode).json({
       status: err.status,
@@ -37,20 +38,30 @@ const handleDuplicateFieldsDB = error => {
   return new AppError(message, 400);
 };
 
-const handleValidatonErrorDB = async error => {
+const handleValidatonErrorDB = error => {
   //const errors = Object.keys(error.errors).map(el => el.ValidatorError);
   //   console.log('error', error);
-  const errorNames = await Object.keys(error.errors).map(el => el);
+  const errorNames = Object.keys(error.errors).map(el => el);
   //   console.log('errorNames', errorNames);
-
-  let message = await Object.keys(error.errors).map((el, index) => {
+  let arrMessage = Object.keys(error.errors).map((el, index) => {
     const validate = errorNames[index];
-
     // console.log('error.errors[validate]', error.errors[validate]);
     return error.errors[validate];
   });
-  console.log('message', message);
-  message = `invalid input for the following fields : ${message.join('. ')}!`;
+
+  const handleJWTError = () =>
+    new AppError('invalid token please login again!', 401);
+
+  const handleJWTExpiredError = () =>
+    new AppError('token expired please log in again!', 401);
+
+  let message = arrMessage.map(el => {
+    return el.toString();
+  });
+  // console.log('message', message);
+  message = `invalid input for the following fields : ${message
+    .join('. ')
+    .trim()}!`;
 
   return new AppError(message, 400);
 };
@@ -71,6 +82,8 @@ module.exports = (err, req, res, next) => {
     if (error.code === 11000) error = handleDuplicateFieldsDB(error);
     if (error._message === 'Tour validation failed')
       error = handleValidatonErrorDB(error);
+    if (error.name === 'JsonWebTokenError') error = handleJWTError();
+    if (error.name === 'TokenExpiredError') error = handleJWTExpiredError();
 
     sendErrorProd(error, res);
   }
