@@ -143,26 +143,30 @@ exports.getTour = catchAsync(async (req, res, next) => {
   // const id = req.params.id * 1;
 
   // const tour = tours.find(el => el.id === id);
-  // try {
-  const tour = await Tour.findById(req.params.id);
-  // const tour = await Tour.findOne({_id:req.params.id})
-
-  if (!tour) {
-    next(new AppError('The tour is not available with the mentioned ID', 404));
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour
+  try {
+    console.log(req.params.id);
+    const tour = await Tour.findById(req.params.id);
+    // const tour = await Tour.findOne({_id:req.params.id})
+    console.log(tour);
+    if (!tour) {
+      return next(
+        new AppError('The tour is not available with the mentioned ID', 404)
+      );
     }
-  });
-  // } catch (error) {
-  //   res.status(404).json({
-  //     status: 'fail',
-  //     message: error
-  //   });
-  // }
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        tour
+      }
+    });
+  } catch (error) {
+    console.log('Error Getting', error);
+    // res.status(404).json({
+    //   status: 'fail',
+    //   message: error
+    // });
+  }
 });
 
 exports.createTour = catchAsync(async (req, res, next) => {

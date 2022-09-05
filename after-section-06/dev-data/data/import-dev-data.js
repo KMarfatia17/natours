@@ -10,17 +10,16 @@ const DB = process.env.DATABASE;
 
 mongoose
   .connect(DB, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false
+    useNewUrlParser: true
+    // mongoose 6 does not support this anymore
+    // useCreateIndex: true,
+    // useFindAndModify: false
   })
   .then(() => {
     console.log('db connection is successful');
   });
 
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf-8')
-);
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8'));
 
 const importData = async () => {
   try {

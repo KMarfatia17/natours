@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
+// const User = require('../models/userModel');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -86,7 +87,32 @@ const tourSchema = new mongoose.Schema(
     secretTour: {
       type: Boolean,
       default: false
-    }
+    },
+    // geospatial data with geoJSOn in mongoDB. it will follow longitude first and latitude later
+    startLocation: {
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point']
+      },
+      coordinates: [Number],
+      address: String,
+      description: String
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point']
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number
+      }
+    ],
+    guides: [{ type: mongoose.Schema.ObjectId, ref: 'User' }]
   },
   {
     toJSON: { virtuals: true },
@@ -105,6 +131,12 @@ tourSchema.pre('save', function(next) {
   next();
 });
 
+// * important * get user documents from the embedded id in the tour document before saving a tour.
+// tourSchema.pre('save', async function(next) {
+//   const guidesPromises = this.guides.map(async id => await User.findById(id));
+//   this.guides = await Promise.all(guidesPromises);
+// });
+
 // tourSchema.pre('save', function(next) {
 //   console.log('the document will be saved....');
 //   next();
@@ -119,6 +151,10 @@ tourSchema.pre('save', function(next) {
 tourSchema.pre(/^find/, function(next) {
   this.find({ secretTour: { $ne: true } });
   this.start = Date.now();
+  this.populate({
+    path: 'guides',
+    select: '-__v -__changedPasswordAt'
+  });
   next();
 });
 

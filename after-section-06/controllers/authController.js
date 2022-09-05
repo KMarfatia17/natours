@@ -1,8 +1,8 @@
 const { promisify } = require('util');
 const crypto = require('crypto');
+const webToken = require('jsonwebtoken');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
-const webToken = require('jsonwebtoken');
 const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');
 
@@ -42,7 +42,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
-    passwordChangedAt: req.body.passwordChangedAt
+    passwordChangedAt: req.body.passwordChangedAt,
+    role: req.body.role
   });
   createSendToken(user, 201, res);
 });
@@ -115,7 +116,7 @@ exports.restrictTo = (...roles) => {
       return next(
         new AppError('you dont have permission to perform this action', 403)
       );
-    else next();
+    next();
   };
 };
 
