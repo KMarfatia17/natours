@@ -20,7 +20,7 @@ const reviewSchema = new mongoose.Schema(
       ref: 'Tour',
       required: [true, 'Review must belong to a tour.']
     },
-    userId: {
+    user: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
       required: [true, 'Review must belong to a user.']
@@ -32,6 +32,19 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
-const Review = mongoose.mode('Review', reviewSchema);
+reviewSchema.pre(/^find/, function(next) {
+  // avoid tripple populates
+  // this.populate({ path: 'tour', select: 'name' }).populate({
+  //   path: 'user',
+  //   select: 'name photo'
+  // });
+
+  this.populate({
+    path: 'user',
+    select: 'name photo'
+  });
+});
+
+const Review = mongoose.model('Review', reviewSchema);
 
 module.exports = Review;
