@@ -9,18 +9,20 @@ router.post('/login', authController.login);
 
 router.post('/forgotpassword', authController.forgotPassword);
 router.patch('/resetpassword/:token', authController.resetPassword);
-router.patch(
-  '/updatemypassword',
-  authController.protect,
-  authController.updatePassword
-);
-router.patch('/updateme', authController.protect, userController.updateMe);
-router.delete('/deleteme', authController.protect, userController.deleteMe);
+
+// protects all routes after this middleware
+router.use(authController.protect);
+
+router.patch('/updatemypassword', authController.updatePassword);
+router.patch('/updateme', userController.updateMe);
+router.delete('/deleteme', userController.deleteMe);
 
 router
   .route('/')
   .get(userController.getAllUsers)
   .post(userController.createUser);
+
+router.route('me').get(userController.getMe, userController.getUser);
 
 router
   .route('/:id')

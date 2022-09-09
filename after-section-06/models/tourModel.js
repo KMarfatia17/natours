@@ -120,6 +120,10 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+// indexing the often used query parameter
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+tourSchema.index({ slug: 1 });
+
 // virtual properties
 tourSchema.virtual('durationInWeeks').get(function() {
   return this.duration / 7;
