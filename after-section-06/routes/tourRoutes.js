@@ -40,4 +40,10 @@ router
     tourController.deleteTour
   );
 
+// geospatial quries tour distance within
+// /tours-within/distance/233/center/lat long/unit/mi
+router
+  .route('/tours-within/distance/:distance/center/:latlng/unit/:unit')
+  .get(tourController.getToursWithin);
+
 module.exports = router;
