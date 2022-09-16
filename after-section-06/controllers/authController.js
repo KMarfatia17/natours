@@ -76,6 +76,8 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
 
   if (!token) {
@@ -106,6 +108,42 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   req.user = currentUser;
+  next();
+});
+
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+  // getting token and check if its there
+  let token;
+
+  if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+
+    if (!token) {
+      return next();
+    }
+
+    // verification token
+    const decoded = await promisify(webToken.verify)(
+      token,
+      process.env.JWT_SECRET
+    );
+
+    // check if user still exists
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser) {
+      return next();
+    }
+
+    //check if the user has changed password after the token is issued
+    if (currentUser.changedPasswordAfter(decoded.iat)) {
+      return next(
+        new AppError('user recently changed password please log in again', 401)
+      );
+    }
+
+    req.locals.user = currentUser;
+    return next();
+  }
   next();
 });
 
