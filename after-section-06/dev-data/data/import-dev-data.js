@@ -44,7 +44,7 @@ const deleteData = async () => {
     await Tour.deleteMany();
     await User.deleteMany();
     await Review.deleteMany();
-    console.log('data is successfully deleted!');
+    // console.log('data is successfully deleted!');
   } catch (error) {
     console.log(error);
   }
@@ -57,4 +57,4 @@ if (process.argv[2] === '--import') {
   deleteData();
 }
 
-console.log(process.argv);
+// console.log(process.argv);

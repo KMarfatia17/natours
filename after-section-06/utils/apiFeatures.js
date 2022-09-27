@@ -9,7 +9,7 @@ class APIFeatures {
     const excludedQuery = ['limit', 'page', 'fields', 'sort'];
     excludedQuery.forEach(el => delete reqQueryObj[el]);
 
-    console.log('reqQueryObj: ', reqQueryObj, ':end');
+    // console.log('reqQueryObj: ', reqQueryObj, ':end');
 
     let queryStr = JSON.stringify(reqQueryObj);
     queryStr = queryStr.replace(

@@ -47,7 +47,7 @@ exports.getAccount = (req, res) => {
   });
 };
 
-exports.getMyTour = catchAsync(async (req, res, next) => {
+exports.getMyTours = catchAsync(async (req, res, next) => {
   const bookings = await Booking.find({ user: req.user.id });
 
   const tourIDs = bookings.map(el => el.tour);
